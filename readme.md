@@ -19,5 +19,5 @@ Once your sheet has been generated (can take some time for very large font sizes
 * Scans all fonts on your computer using a Flash swf
 * Supports cursive fonts and odd-shaped fonts
 * Preview your sheet before generating
-* Load Google Web Fonts into the system by specifying the font name and clicking "Load Font"
+* Use Google Web Fonts by specifying the font name and clicking "Load Font"
 * Generated image contains pixel-encoded JSON data with the original image settings so they can be read and identified at a future time
