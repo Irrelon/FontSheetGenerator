@@ -65,10 +65,6 @@ function updateFontSelect () {
 		op.attr('value', allFonts[fontIndex]);
 		op.text(allFonts[fontIndex]);
 		op.appendTo(fontListElement);
-
-		if (allFonts[fontIndex] === 'Kunstler Script') {
-			op.attr('selected', 'selected');
-		}
 	}
 }
 
@@ -150,7 +146,8 @@ function generateCanvasFont() {
 		// Some variables we are going to use
 		characterIndex,
 		widthArr = [],
-		pixelShiftArr = [],
+		pixelShiftXArr = [],
+		pixelShiftYArr = [],
 		pixelWidthArr = [],
 		pixelHeightArr = [],
 		maxWidth = 0,
@@ -159,11 +156,13 @@ function generateCanvasFont() {
 		arrCount,
 		xSpace,
 		imageData,
-		x, y, foundMaxX, foundMaxY, foundMinX;
+		x, y,
+		foundMinX, foundMinY,
+		foundMaxX, foundMaxY;
 
 	// Set back buffer size
 	backBuffer.width = fontSize * 4;
-	backBuffer.height = fontSize * 2;
+	backBuffer.height = fontSize * 4;
 
 	// Set the canvas font data
 	backBufferCtx.font = fontSize + fontSizeUnit + ' "' + fontName + '"';
@@ -192,6 +191,7 @@ function generateCanvasFont() {
 			for (y = backBuffer.height - 1; y >= 0; y--) {
 				if(imageData[(y * (backBuffer.width * 4)) + (x * 4) + 3]) {
 					foundMinX = foundMinX < x ? foundMinX : x;
+					foundMinY = foundMinY < y ? foundMinY : y;
 
 					foundMaxX = foundMaxX > x ? foundMaxX : x;
 					foundMaxY = foundMaxY > y ? foundMaxY : y;
@@ -202,8 +202,9 @@ function generateCanvasFont() {
 
 		// If we have a negative pixel horizontal starting point,
 		// record it as a positive value, otherwise record zero
-		pixelShiftArr[characterIndex] = (foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) < 0 ? -(foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) : 0;
-		pixelWidthArr[characterIndex] = (foundMaxX - (((backBuffer.width / 2) - fontSize) | 0)) + pixelShiftArr[characterIndex];
+		pixelShiftXArr[characterIndex] = (foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) < 0 ? -(foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) : 0;
+		pixelShiftYArr[characterIndex] = foundMinY < 0 ? -foundMinY : 0;
+		pixelWidthArr[characterIndex] = (foundMaxX - (((backBuffer.width / 2) - fontSize) | 0)) + pixelShiftXArr[characterIndex];
 		pixelHeightArr[characterIndex] = foundMaxY;
 
 		canvasWidth += (widthArr[characterIndex] > pixelWidthArr[characterIndex] ? widthArr[characterIndex] : pixelWidthArr[characterIndex]) + characterSpacing;
@@ -213,9 +214,12 @@ function generateCanvasFont() {
 
 	// Set the space character w/h
 	widthArr[0] = widthArr[1];
-	pixelShiftArr[0] = pixelShiftArr[1];
+	pixelShiftXArr[0] = pixelShiftXArr[1];
 	pixelWidthArr[0] = pixelWidthArr[1];
 	pixelHeightArr[0] = pixelHeightArr[1];
+
+	// Update the maxHeight
+	maxHeight += (foundMinY / 2);
 
 	// Set the output canvas size
 	canvas.width = canvasWidth + (pixelWidthArr[0] > widthArr[0] ? pixelWidthArr[0] : widthArr[0]);
@@ -249,7 +253,7 @@ function generateCanvasFont() {
 	arrCount = characterArr.length;
 	for(characterIndex = 0; characterIndex < arrCount; characterIndex++) {
 		// Draw the character
-		ctx.fillText(characterArr[characterIndex], xSpace + pixelShiftArr[characterIndex], 0);
+		ctx.fillText(characterArr[characterIndex], xSpace + pixelShiftXArr[characterIndex], 0);
 
 		// Draw the measured width line
 		ctx.fillStyle = '#000000';

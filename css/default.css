@@ -4,6 +4,7 @@
 
 #fontPreview {
     line-height: normal;
+    white-space: nowrap;
 }
 
 #fontLoaded {
@@ -16,9 +17,9 @@
 }
 
 #fontPreviewBackBuffer {
-    display: none;
+    /*display: none;*/
 }
 
-#fontCanvasScroll {
+.fontScroll {
     overflow: scroll;
 }

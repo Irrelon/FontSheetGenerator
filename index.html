@@ -28,7 +28,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Irrelon Font Sheet Generator</title>
+		<title>Font Sheet Generator - Isogenic Game Engine</title>
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 		<link href="css/default.css" rel="stylesheet">
@@ -47,10 +47,10 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</a>
-					<a class="brand" href="#">Irrelon Font Sheet Generator</a>
+					<a class="brand" href="#">Isogenic Game Engine</a>
 					<div class="nav-collapse">
 						<ul class="nav">
-							<li class="active"><a href="#">Generator</a></li>
+							<li class="active"><a href="#">Font Sheet Generator</a></li>
 							<li><a href="http://www.isogenicengine.com">Isogenic Game Engine</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
@@ -125,13 +125,15 @@
 					<div class="span12" id="previewWell" style="display: none;">
 						<h2>Output Preview<span class="fontPreviewName"></span></h2>
 						<div class="well">
-							<div id="fontPreview" style="font-size: 26pt;"></div>
+							<div class="fontScroll">
+								<div id="fontPreview" style="font-size: 26pt;"></div>
+							</div>
 						</div>
 					</div>
 					<div class="span12" id="finalWell" style="display: none;">
 						<h2>Final Font Sheet<span class="fontPreviewName"></span></h2>
 						<div class="well">
-							<div id="fontCanvasScroll">
+							<div class="fontScroll">
 								<canvas id="fontPreviewCanvas" width="600" height="40" style="display: block;"></canvas>
 							</div>
 							<div id="imageBase64"></div><br \>
