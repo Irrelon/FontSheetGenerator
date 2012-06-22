@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Irrelon Font Sheet Generator</title>
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="css/default.css" rel="stylesheet">
+	    <style>
+			body {
+				padding-top: 60px;
+			}
+	    </style>
+	</head>
+	<body>
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
+					<a class="brand" href="#">Irrelon Font Sheet Generator</a>
+					<div class="nav-collapse">
+						<ul class="nav">
+							<li class="active"><a href="#">Generator</a></li>
+							<li><a href="http://www.isogenicengine.com">Isogenic Game Engine</a></li>
+						</ul>
+					</div><!--/.nav-collapse -->
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<header class="jumbotron subhead">
+				<h1>Font Sheet Generator</h1>
+				<p>
+					This tool allows you to generate font sheets that you can use with your
+					<a href="http://www.isogenicengine.com" target="_blank">Isogenic Game Engine</a> game projects to render any font in your game without
+					the font being available on the target platform / device. It creates an
+					image from the font with all the letters, numbers and symbols that you
+					might want to use. You can then save the image for use in your project.
+				</p>
+			</header>
+			<section id="sheetSettings">
+				<div class="page-header"></div>
+				<div class="row">
+					<div class="span5">
+						<h2>Render Sheet</h2>
+						<form class="well">
+							<table>
+								<tr>
+									<td>Font Name:</td>
+									<td width="10">&nbsp;</td>
+									<td colspan="2">Font Size:</td>
+								</tr>
+								<tr>
+									<td><select class="span3" id="fontList" onchange="displayPreview();"></select></td>
+									<td width="10">&nbsp;</td>
+									<td><input class="span1" type="number" min="1" step="1" value="26" id="fontSize" onchange="displayPreview();" /></td>
+									<td>
+										<select class="span1" id="fontSizeUnit" onchange="displayPreview();">
+											<option value="pt">pt</option>
+											<option value="px">px</option>
+										</select>
+									</td>
+								</tr>
+							</table>
+							<table>
+								<tr>
+									<td>Spacing:</td>
+									<td width="10">&nbsp;</td>
+									<td colspan="2">Character Range:</td>
+									<td width="10">&nbsp;</td>
+									<td>Debug Lines:</td>
+								</tr>
+								<tr>
+									<td><input class="span1" type="number" min="1" step="1" value="1" id="characterSpacing" onchange="displayPreview();" /></td>
+									<td width="10">&nbsp;</td>
+									<td><input class="span1" type="number" min="1" step="1" value="32" id="characterFrom" onchange="displayPreview();" /></td>
+									<td><input class="span1" type="number" min="1" step="1" value="126" id="characterTo" onchange="displayPreview();" /></td>
+									<td width="10">&nbsp;</td>
+									<td><input type="checkbox" id="debugCanvas" value="1" /></td>
+								</tr>
+							</table>
+							<div id="generateButton" class="btn btn-primary" onclick="displayPreview(); generateCanvasFont();">Generate Sheet...</div>
+						</form>
+					</div>
+					<div class="span3">
+						<h2>Add Google Web Font</h2>
+						<form class="well">
+							<label for="fontName">Font Name:</label>
+							<input type="text" id="fontName" placeholder="Font Name" />
+							<div id="fontLoaded"></div>
+							<input class="btn" type="button" value="Load Font" onclick="addGoogleWebFont($('#fontName').val());" />
+						</form>
+					</div>
+					<div class="span12" id="previewWell" style="display: none;">
+						<h2>Output Preview<span class="fontPreviewName"></span></h2>
+						<div class="well">
+							<div id="fontPreview" style="font-size: 26pt;"></div>
+						</div>
+					</div>
+					<div class="span12" id="finalWell" style="display: none;">
+						<h2>Final Font Sheet<span class="fontPreviewName"></span></h2>
+						<div class="well">
+							<div id="fontCanvasScroll">
+								<canvas id="fontPreviewCanvas" width="600" height="40" style="display: block;"></canvas>
+							</div>
+							<div id="imageBase64"></div><br \>
+							<div class="btn btn-primary" onclick="saveFontSheet();">Save Image...</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<canvas id="fontPreviewBackBuffer" width="40" height="40"></canvas>
+
+		<!-- Load all our JS -->
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="CanvasJsonDataEncoder/canvasDataEncoder.js"></script>
+		<script type="text/javascript" src="js/generator.js"></script>
+
+		<!-- Add the FontList flash object to grab fonts from the system -->
+		<!-- Original from: http://hasseg.org/blog/post/526/getting-a-list-of-installed-fonts-with-flash-and-javascript/ -->
+		<object id="fontListSWF" name="fontListSWF" type="application/x-shockwave-flash" data="./swf/FontList.swf" width="1" height="1">
+		    <param name="movie" value="./swf/FontList.swf">
+			<embed src="./swf/FontList.swf" width="1" height="1"></embed>
+		</object>
+	</body>
+</html>
