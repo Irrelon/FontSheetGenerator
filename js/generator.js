@@ -219,7 +219,7 @@ function generateCanvasFont() {
 	pixelHeightArr[0] = pixelHeightArr[1];
 
 	// Update the maxHeight
-	maxHeight += (foundMinY / 2);
+	maxHeight += (foundMinY / 2) + 2;
 
 	// Set the output canvas size
 	canvas.width = canvasWidth + (pixelWidthArr[0] > widthArr[0] ? pixelWidthArr[0] : widthArr[0]);
