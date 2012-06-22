@@ -100,11 +100,11 @@ function addGoogleWebFont (fontName) {
 function displayPreview () {
 	"use strict";
 	var fontName = $('#fontList').val(),
-		fontSize = parseInt($('#fontSize').val()),
+		fontSize = parseInt($('#fontSize').val(), 10),
 		fontSizeUnit = $('#fontSizeUnit').val(),
-		characterSpacing = parseInt($('#characterSpacing').val()),
-		characterFrom = parseInt($('#characterFrom').val()),
-		characterTo = parseInt($('#characterTo').val()),
+		characterSpacing = parseInt($('#characterSpacing').val(), 10),
+		characterFrom = parseInt($('#characterFrom').val(), 10),
+		characterTo = parseInt($('#characterTo').val(), 10),
 		fontPreview = $('#fontPreview'),
 		characterIndex;
 
@@ -136,11 +136,11 @@ function displayPreview () {
 function generateCanvasFont() {
 	"use strict";
 	var fontName = $('#fontList').val(),
-		fontSize = parseInt($('#fontSize').val()),
+		fontSize = parseInt($('#fontSize').val(), 10),
 		fontSizeUnit = $('#fontSizeUnit').val(),
-		characterSpacing = parseInt($('#characterSpacing').val()),
-		characterFrom = parseInt($('#characterFrom').val()),
-		characterTo = parseInt($('#characterTo').val()),
+		characterSpacing = parseInt($('#characterSpacing').val(), 10),
+		characterFrom = parseInt($('#characterFrom').val(), 10),
+		characterTo = parseInt($('#characterTo').val(), 10),
 		drawDebug = $('#debugCanvas:checked').val(),
 		canvas = $('#fontPreviewCanvas')[0],
 		ctx = canvas.getContext('2d'),
@@ -219,7 +219,7 @@ function generateCanvasFont() {
 
 	// Set the output canvas size
 	canvas.width = canvasWidth + (pixelWidthArr[0] > widthArr[0] ? pixelWidthArr[0] : widthArr[0]);
-	canvas.height = maxHeight + 3;
+	canvas.height = maxHeight + 4;
 
 	// Set the canvas font data
 	ctx.font = fontSize + fontSizeUnit + ' "' + fontName + '"';
@@ -229,11 +229,12 @@ function generateCanvasFont() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	// Encode and draw the data tag
-	canvasDataEncoder.encode(canvas, 0, 0, 8, [
+	canvasDataEncoder.encode(canvas, 0, maxHeight + 3, canvas.width, [
 		{
-			generator:'Irrelon Font Sheet Generator',
+			generator: 'Irrelon Font Sheet Generator',
 			url: 'http://www.isogenicengine.com',
-			provider: 'Irrelon Software Limited'
+			provider: 'Irrelon Software Limited',
+			source: 'https://github.com/coolbloke1324/FontSheetGenerator'
 		},
 		characterFrom, // Character start
 		characterTo, // Character end
@@ -269,8 +270,6 @@ function generateCanvasFont() {
 
 	$('#previewWell').hide();
 	$('#finalWell').show();
-
-	console.log(canvasDataEncoder.decode(canvas, 0, 0, 8));
 }
 
 function saveFontSheet() {

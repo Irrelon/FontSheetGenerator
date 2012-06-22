@@ -21,3 +21,7 @@ Once your sheet has been generated (can take some time for very large font sizes
 * Preview your sheet before generating
 * Use Google Web Fonts by specifying the font name and clicking "Load Font"
 * Generated image contains pixel-encoded JSON data with the original image settings so they can be read and identified at a future time
+
+##Limitations
+
+* Minimum font size supported is 12pt
