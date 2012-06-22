@@ -33,3 +33,6 @@ Once your sheet has been generated (can take some time for very large font sizes
 
 The save functionality uses PHP to decode the data URI and send back the image to the browser. This is to
 solve a problem with Chrome 19 not being able to save images from a data URI.
+
+## License
+Open Source MIT license.
