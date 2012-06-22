@@ -137,7 +137,11 @@
 								<canvas id="fontPreviewCanvas" width="600" height="40" style="display: block;"></canvas>
 							</div>
 							<div id="imageBase64"></div><br \>
-							<div class="btn btn-primary" onclick="saveFontSheet();">Save Image...</div>
+							<form action="saver/savePng.php" method="post">
+								<input type="hidden" id="formImageFileName" name="imageFileName">
+								<input type="hidden" id="formImageData" name="imageData" value="" />
+								<input type="submit" class="btn btn-primary" id="saveImageButton" value="Save Image..." />
+							</form>
 						</div>
 					</div>
 				</div>

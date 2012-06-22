@@ -272,11 +272,13 @@ function generateCanvasFont() {
 		xSpace += (widthArr[characterIndex] > pixelWidthArr[characterIndex] ? widthArr[characterIndex] : pixelWidthArr[characterIndex]) + characterSpacing;
 	}
 
+	// Update the save button form data to the new image data
+	var data = $('#fontPreviewCanvas')[0].toDataURL("image/png");
+	$('#formImageData').val(data);
+
+	// Set the resulting image file name
+	$('#formImageFileName').val(fontName + '_' + fontSize + fontSizeUnit + '.png');
+
 	$('#previewWell').hide();
 	$('#finalWell').show();
-}
-
-function saveFontSheet() {
-	"use strict";
-	window.open($('#fontPreviewCanvas')[0].toDataURL("image/png"));
 }
