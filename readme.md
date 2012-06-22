@@ -4,6 +4,9 @@ projects to render any font in your game without the font being available on the
 It creates an image from the font with all the letters, numbers and symbols that you might want to use.
 You can then save the image for use in your project.
 
+## Live Version
+http://www.isogenicengine.com/tools/fontSheetGenerator
+
 ## Features
 
 * Scans all fonts on your computer using a Flash swf
