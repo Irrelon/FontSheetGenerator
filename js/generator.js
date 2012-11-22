@@ -21,6 +21,18 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+
+// TODO: Follow this pseudo-code in the next version:
+	// Draw each character to a back-buffer and measure the start x, y and width, height
+	// if any part of the character is larger than the back-buffer, adjust the back-buffer size and rescan until no part of the character is painting opaque pixels at the outer edges
+	// loop each character and determine the maximum width and height
+	// set the front-buffer height to maxheight + 4 pixels
+	// draw the first 3 lines of the image as header data, measured width and actual pixel width of each character
+	// draw the character from pixel line 4
+	// max width of total image shouldn't exceed 1024 - after rendering,
+	// cut up image and arrange each 1024 block under the last which can be re-assembled
+	// at the other end. Have the 1024 width limit as an optional value that is stored in the
+	// header
 var allFonts = [],
 	characterArr = [];
 
@@ -98,29 +110,54 @@ function displayPreview () {
 	var fontName = $('#fontList').val(),
 		fontSize = parseInt($('#fontSize').val(), 10),
 		fontSizeUnit = $('#fontSizeUnit').val(),
+		fontColor = $('#fontColor').val(),
+		fontStyle = $('#fontStyle').val(),
+		fontWeight = $('#fontWeight').val(),
 		characterSpacing = parseInt($('#characterSpacing').val(), 10),
-		characterFrom = parseInt($('#characterFrom').val(), 10),
-		characterTo = parseInt($('#characterTo').val(), 10),
+		characterList = $('#characterList').val(),
 		fontPreview = $('#fontPreview'),
-		characterIndex;
+		characterIndex,
+		r, g, b, colorTotal, backColor;
+
+	// Work out the inverse font color
+	r = parseInt(fontColor.substr(1, 2), 16);
+	g = parseInt(fontColor.substr(3, 2), 16);
+	b = parseInt(fontColor.substr(5, 2), 16);
+
+	colorTotal = ((r + b + g) / 3) | 0;
+	if (colorTotal > 128) {
+		// Set the background as black
+		backColor = '#000000';
+	} else {
+		// Set the background as white
+		backColor = '#ffffff';
+	}
+
+	// Set the background to the inverse
+	// so that the characters are clearly visible
+	$('#fontPreview').css('background-color', backColor)
+		.css('color', fontColor);
+	$('.fontScroll').css('background-color', backColor);
 
 	// Clear the character array
 	characterArr = [];
 	fontPreview.html('');
 
 	// Generate an array of all the characters we want to draw
-	for(characterIndex = characterFrom; characterIndex <= characterTo; characterIndex++) {
-		characterArr.push(String.fromCharCode(characterIndex));
+	for(characterIndex = 0; characterIndex < characterList.length; characterIndex++) {
+		characterArr.push(characterList[characterIndex]);
 		fontPreview.html(fontPreview.html() + characterArr[characterArr.length - 1]);
 	}
 
 	if (fontName) {
 		$('#fontPreview')
-			.css('font-family', fontName)
+			.css('font-family', '"' + fontName + '"')
 			.css('font-size', fontSize + fontSizeUnit)
+			.css('font-style', fontStyle)
+			.css('font-weight', fontWeight)
 			.css('letter-spacing', characterSpacing + 'px');
 
-		$('.fontPreviewName').html(' - ' + fontName + ' @ ' + fontSize + fontSizeUnit);
+		$('.fontPreviewName').html(' - ' + fontName + ' @ ' + fontSize + fontSizeUnit + ' ' + fontStyle + ' ' + fontWeight + ' ');
 		$('#previewWell').show();
 		$('#finalWell').hide();
 	} else {
@@ -134,9 +171,11 @@ function generateCanvasFont() {
 	var fontName = $('#fontList').val(),
 		fontSize = parseInt($('#fontSize').val(), 10),
 		fontSizeUnit = $('#fontSizeUnit').val(),
+		fontColor = $('#fontColor').val(),
+		fontStyle = $('#fontStyle').val(),
+		fontWeight = $('#fontWeight').val(),
 		characterSpacing = parseInt($('#characterSpacing').val(), 10),
-		characterFrom = parseInt($('#characterFrom').val(), 10),
-		characterTo = parseInt($('#characterTo').val(), 10),
+		characterList = $('#characterList').val(),
 		drawDebug = $('#debugCanvas:checked').val(),
 		canvas = $('#fontPreviewCanvas')[0],
 		ctx = canvas.getContext('2d'),
@@ -158,14 +197,17 @@ function generateCanvasFont() {
 		imageData,
 		x, y,
 		foundMinX, foundMinY,
-		foundMaxX, foundMaxY;
+		foundMaxX, foundMaxY,
+		charCodes = {},
+		charPosition = [],
+		data;
 
 	// Set back buffer size
 	backBuffer.width = fontSize * 4;
 	backBuffer.height = fontSize * 4;
 
 	// Set the canvas font data
-	backBufferCtx.font = fontSize + fontSizeUnit + ' "' + fontName + '"';
+	backBufferCtx.font = fontStyle + ' ' + fontWeight + ' ' + fontSize + fontSizeUnit + ' "' + fontName + '"';
 	backBufferCtx.textBaseline = 'top';
 
 	// Loop each character and draw it to the back buffer
@@ -204,7 +246,7 @@ function generateCanvasFont() {
 		// record it as a positive value, otherwise record zero
 		pixelShiftXArr[characterIndex] = (foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) < 0 ? -(foundMinX - (((backBuffer.width / 2) - fontSize) | 0)) : 0;
 		pixelShiftYArr[characterIndex] = foundMinY < 0 ? -foundMinY : 0;
-		pixelWidthArr[characterIndex] = (foundMaxX - (((backBuffer.width / 2) - fontSize) | 0)) + pixelShiftXArr[characterIndex];
+		pixelWidthArr[characterIndex] = ((foundMaxX - (((backBuffer.width / 2) - fontSize) | 0)) + pixelShiftXArr[characterIndex]) + 1;
 		pixelHeightArr[characterIndex] = foundMaxY;
 
 		canvasWidth += (widthArr[characterIndex] > pixelWidthArr[characterIndex] ? widthArr[characterIndex] : pixelWidthArr[characterIndex]) + characterSpacing;
@@ -223,62 +265,67 @@ function generateCanvasFont() {
 
 	// Set the output canvas size
 	canvas.width = canvasWidth + (pixelWidthArr[0] > widthArr[0] ? pixelWidthArr[0] : widthArr[0]);
-	canvas.height = maxHeight + 4;
+	canvas.height = maxHeight + 10;
 
 	// Set the canvas font data
-	ctx.font = fontSize + fontSizeUnit + ' "' + fontName + '"';
+	ctx.font = fontStyle + ' ' + fontWeight + ' ' + fontSize + fontSizeUnit + ' "' + fontName + '"';
 	ctx.textBaseline = 'top';
 
 	// Clear the canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	// Encode and draw the data tag
-	canvasDataEncoder.encode(canvas, 0, maxHeight + 3, canvas.width, [
-		{
-			generator: 'Irrelon Font Sheet Generator',
-			url: 'http://www.isogenicengine.com',
-			provider: 'Irrelon Software Limited',
-			source: 'https://github.com/coolbloke1324/FontSheetGenerator'
-		},
-		characterFrom, // Character start
-		characterTo, // Character end
-		characterSpacing, // Character spacing
-		fontSize, // Font size
-		(fontSizeUnit === 'pt' ? 0 : 1), // Font Unit as a boolean
-		fontName // Font Name
-	]);
-
 	// Now loop again and draw the width lines
 	xSpace = 0;
 	arrCount = characterArr.length;
+	ctx.fillStyle = fontColor;
+
 	for(characterIndex = 0; characterIndex < arrCount; characterIndex++) {
 		// Draw the character
-		ctx.fillText(characterArr[characterIndex], xSpace + pixelShiftXArr[characterIndex], 0);
-
-		// Draw the measured width line
-		ctx.fillStyle = '#000000';
-		ctx.fillRect(xSpace, maxHeight + 1, widthArr[characterIndex], 1);
-
-		// Draw the absolute width line (Math.max() of canvas
-		// measured width and pixel measured width
-		ctx.fillStyle = '#000000';
-		ctx.fillRect(xSpace, maxHeight + 2, Math.max(pixelWidthArr[characterIndex], widthArr[characterIndex]), 1);
+		ctx.fillText(characterArr[characterIndex], xSpace + pixelShiftXArr[characterIndex], 6);
+		charCodes[characterArr[characterIndex].charCodeAt(0)] = characterIndex;
+		charPosition[characterIndex] = xSpace + pixelShiftXArr[characterIndex];
 
 		if (drawDebug) {
 			// Draw the character dividing line
-			ctx.fillRect(xSpace, 0, 1, maxHeight + 2);
+			ctx.fillRect(xSpace, 6, 1, maxHeight);
 		}
 
 		xSpace += (widthArr[characterIndex] > pixelWidthArr[characterIndex] ? widthArr[characterIndex] : pixelWidthArr[characterIndex]) + characterSpacing;
 	}
 
+	// Encode and draw the data tag
+	canvasDataEncoder.encode(canvas, 0, 0, canvas.width, {
+		vendor: {
+			generator: 'Irrelon Font Sheet Generator',
+			url: 'http://www.isogenicengine.com/tools/fontSheetGenerator/index.html',
+			provider: 'Irrelon Software Limited',
+			source: 'https://github.com/coolbloke1324/FontSheetGenerator'
+		},
+		font: {
+			fontSize: fontSize,
+			fontSizeUnit: fontSizeUnit,
+			fontName: fontName,
+			fontColor: fontColor,
+			fontWeight: fontWeight,
+			fontStyle: fontStyle
+		},
+		characters: {
+			characterList: characterList, // Character list
+			characterSpacing: characterSpacing, // Character spacing
+			charCodes: charCodes, // Array of character codes and their array index,
+			charPosition: charPosition, // Array of character x co-ordinates
+			measuredWidth: widthArr, // Array of character canvas measured widths
+			pixelWidth: pixelWidthArr // Array of character pixel measured widths
+		}
+	});
+
 	// Update the save button form data to the new image data
-	var data = $('#fontPreviewCanvas')[0].toDataURL("image/png");
+	data = $('#fontPreviewCanvas')[0].toDataURL("image/png");
 	$('#formImageData').val(data);
 
 	// Set the resulting image file name
 	$('#formImageFileName').val(fontName + '_' + fontSize + fontSizeUnit + '.png');
 
-	$('#previewWell').hide();
+	//$('#previewWell').hide();
 	$('#finalWell').show();
 }
