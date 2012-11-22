@@ -113,9 +113,13 @@ function displayPreview () {
 		fontColor = $('#fontColor').val(),
 		fontStyle = $('#fontStyle').val(),
 		fontWeight = $('#fontWeight').val(),
+		fontStroke = $('#fontStroke').val(),
+		fontStrokeColor = $('#fontStrokeColor').val(),
 		characterSpacing = parseInt($('#characterSpacing').val(), 10),
 		characterList = $('#characterList').val(),
-		fontPreview = $('#fontPreview'),
+		fontPreview = $('.fontPreview'),
+		fontPreviewBack = $('#fontBack'),
+		fontPreviewFront = $('#fontFront'),
 		characterIndex,
 		r, g, b, colorTotal, backColor;
 
@@ -135,8 +139,8 @@ function displayPreview () {
 
 	// Set the background to the inverse
 	// so that the characters are clearly visible
-	$('#fontPreview').css('background-color', backColor)
-		.css('color', fontColor);
+	fontPreview.css('color', fontColor);
+	fontPreviewBack.css('background-color', backColor);
 	$('.fontScroll').css('background-color', backColor);
 
 	// Clear the character array
@@ -150,12 +154,15 @@ function displayPreview () {
 	}
 
 	if (fontName) {
-		$('#fontPreview')
+		fontPreview
 			.css('font-family', '"' + fontName + '"')
 			.css('font-size', fontSize + fontSizeUnit)
 			.css('font-style', fontStyle)
 			.css('font-weight', fontWeight)
 			.css('letter-spacing', characterSpacing + 'px');
+
+		// Set the stroke on the background text
+		fontPreviewBack.css('-webkit-text-stroke', fontStroke + 'px ' + fontStrokeColor);
 
 		$('.fontPreviewName').html(' - ' + fontName + ' @ ' + fontSize + fontSizeUnit + ' ' + fontStyle + ' ' + fontWeight + ' ');
 		$('#previewWell').show();
@@ -164,6 +171,8 @@ function displayPreview () {
 		$('#previewWell').hide();
 		$('#finalWell').hide();
 	}
+
+	$('#fontPreview').height(fontPreviewFront.height());
 }
 
 function generateCanvasFont() {
@@ -174,6 +183,8 @@ function generateCanvasFont() {
 		fontColor = $('#fontColor').val(),
 		fontStyle = $('#fontStyle').val(),
 		fontWeight = $('#fontWeight').val(),
+		fontStroke = $('#fontStroke').val(),
+		fontStrokeColor = $('#fontStrokeColor').val(),
 		characterSpacing = parseInt($('#characterSpacing').val(), 10),
 		characterList = $('#characterList').val(),
 		drawDebug = $('#debugCanvas:checked').val(),
@@ -209,6 +220,10 @@ function generateCanvasFont() {
 	// Set the canvas font data
 	backBufferCtx.font = fontStyle + ' ' + fontWeight + ' ' + fontSize + fontSizeUnit + ' "' + fontName + '"';
 	backBufferCtx.textBaseline = 'top';
+	if (fontStroke) {
+		backBufferCtx.strokeStyle = fontStrokeColor;
+		backBufferCtx.lineWidth = fontStroke;
+	}
 
 	// Loop each character and draw it to the back buffer
 	// in the center position and then measure it via
@@ -218,6 +233,10 @@ function generateCanvasFont() {
 	for(characterIndex = 1; characterIndex < arrCount; characterIndex++) {
 		// Draw the character
 		backBufferCtx.clearRect(0, 0, backBuffer.width, backBuffer.height);
+		if (fontStroke) {
+			backBufferCtx.strokeText(characterArr[characterIndex], ((backBuffer.width / 2) - fontSize) | 0, 0);
+		}
+
 		backBufferCtx.fillText(characterArr[characterIndex], ((backBuffer.width / 2) - fontSize) | 0, 0);
 		widthArr[characterIndex] = backBufferCtx.measureText(characterArr[characterIndex]).width;
 
@@ -271,6 +290,11 @@ function generateCanvasFont() {
 	ctx.font = fontStyle + ' ' + fontWeight + ' ' + fontSize + fontSizeUnit + ' "' + fontName + '"';
 	ctx.textBaseline = 'top';
 
+	if (fontStroke) {
+		ctx.strokeStyle = fontStrokeColor;
+		ctx.lineWidth = fontStroke;
+	}
+
 	// Clear the canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -281,7 +305,13 @@ function generateCanvasFont() {
 
 	for(characterIndex = 0; characterIndex < arrCount; characterIndex++) {
 		// Draw the character
+		if (fontStroke > 0) {
+			console.log(fontStroke);
+			ctx.strokeText(characterArr[characterIndex], xSpace + pixelShiftXArr[characterIndex], 6);
+		}
 		ctx.fillText(characterArr[characterIndex], xSpace + pixelShiftXArr[characterIndex], 6);
+
+
 		charCodes[characterArr[characterIndex].charCodeAt(0)] = characterIndex;
 		charPosition[characterIndex] = xSpace + pixelShiftXArr[characterIndex];
 

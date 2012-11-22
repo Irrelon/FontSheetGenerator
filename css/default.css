@@ -3,8 +3,7 @@
 }
 
 #fontPreview {
-    line-height: normal;
-    white-space: nowrap;
+    position: relative;
 }
 
 #fontLoaded {
@@ -22,4 +21,22 @@
 
 .fontScroll {
     overflow: scroll;
+}
+
+#fontBack {
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    line-height: normal;
+    white-space: nowrap;
+}
+
+#fontFront {
+    display: block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    line-height: normal;
+    white-space: nowrap;
 }
