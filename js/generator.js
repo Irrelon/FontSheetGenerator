@@ -286,6 +286,15 @@ function generateCanvasFont() {
 	canvas.width = canvasWidth + (pixelWidthArr[0] > widthArr[0] ? pixelWidthArr[0] : widthArr[0]);
 	canvas.height = maxHeight + 10;
 
+	// Check that the canvas will have divisible by 2 dimensions
+	if (canvas.width % 2) {
+		canvas.width += 1;
+	}
+
+	if (canvas.height % 2) {
+		canvas.height += 1;
+	}
+
 	// Set the canvas font data
 	ctx.font = fontStyle + ' ' + fontWeight + ' ' + fontSize + fontSizeUnit + ' "' + fontName + '"';
 	ctx.textBaseline = 'top';
